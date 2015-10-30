@@ -25,6 +25,7 @@
 /* Begin PBXFileReference section */
 		0BEB56451BE4300B00C62808 /* ArduinoSerialTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ArduinoSerialTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BEB56481BE4300C00C62808 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		0BEB564F1BE436A000C62808 /* ArduionoSerialTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArduionoSerialTest.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				0BEB56481BE4300C00C62808 /* main.cpp */,
+				0BEB564F1BE436A000C62808 /* ArduionoSerialTest.h */,
 			);
 			path = ArduinoSerialTest;
 			sourceTree = "<group>";
@@ -237,6 +239,7 @@
 				0BEB564E1BE4300C00C62808 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
