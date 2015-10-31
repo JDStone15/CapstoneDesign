@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SecondWindow</class>
- <widget class="QDialog" name="SecondWindow">
+ <class>ScanWindow</class>
+ <widget class="QDialog" name="ScanWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,22 +17,32 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>3D Scanner</string>
+   <string>Scanning</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QLabel" name="lbloriginal">
    <property name="geometry">
     <rect>
-     <x>500</x>
-     <y>300</y>
-     <width>221</width>
-     <height>71</height>
+     <x>30</x>
+     <y>80</y>
+     <width>512</width>
+     <height>288</height>
     </rect>
    </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(0, 0, 0);</string>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="on_btnPauseOrResume">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>530</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
    </property>
    <property name="text">
-    <string>Perform Scan</string>
+    <string>Pause</string>
    </property>
   </widget>
  </widget>

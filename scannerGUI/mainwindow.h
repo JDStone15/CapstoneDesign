@@ -4,13 +4,6 @@
 #include <QMainWindow>
 #include <secondwindow.h>
 
-#include <opencv2/opencv.hpp>
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define LOGO_IMAGE_IMAC "/Users/jacobstone/Documents/Github/CapstoneDesign/scannerGUI/logo.gif"
 #define LOGO_IMAGE_MACBOOK "/Users/jacobstone/Documents/Github/CapstoneDesign/scannerGUI/logo.gif"

@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include <scanwindow.h>
+
 namespace Ui {
 class SecondWindow;
 }
@@ -14,6 +16,9 @@ class SecondWindow : public QDialog
 public:
     explicit SecondWindow(QWidget *parent = 0);
     ~SecondWindow();
+
+private slots:
+    void on_pushButton_clicked();
 
 private:
     Ui::SecondWindow *ui;

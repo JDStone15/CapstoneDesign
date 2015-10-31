@@ -12,3 +12,11 @@ SecondWindow::~SecondWindow()
 {
     delete ui;
 }
+
+void SecondWindow::on_pushButton_clicked()
+{
+    this->hide();
+    ScanWindow scanwindow;
+    scanwindow.setModal(true);
+    scanwindow.exec();
+}

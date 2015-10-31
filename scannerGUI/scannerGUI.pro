@@ -16,12 +16,16 @@ LIBS += -L/usr/local/lib -lopencv_calib3d -lopencv_core -lopencv_imgcodecs -lope
 
 SOURCES += main.cpp\
     mainwindow.cpp \
-    secondwindow.cpp
+    secondwindow.cpp \
+    scanwindow.cpp
 
 HEADERS  += \
     mainwindow.h \
-    secondwindow.h
+    secondwindow.h \
+    scanwindow.h \
+    common.h
 
 FORMS    += \
     mainwindow.ui \
-    secondwindow.ui
+    secondwindow.ui \
+    scanwindow.ui
