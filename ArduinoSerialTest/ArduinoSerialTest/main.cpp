@@ -72,9 +72,20 @@ int main(int argc, const char * argv[]) {
     handshake(fd, 0);
     
     // just for testing purposes
-    for(int i = 0; i < 3; ++i){
-        cout << "Enter number between -127 and 127: ";
+    for(int i = 0; i < 10; ++i){
+        cout << "Enter number between 0 and 4095 to move servo: ";
         cin >> input;
+        int check = atoi(input.c_str());
+  /*      if(check < 0 || check > 4095){
+            cout << "error in input" << endl;
+            input = "-1";
+            write(fd, input.c_str(), sizeof(input));
+            sleep(1);
+            close(fd);
+            sleep(1);
+            return 0;
+        }
+        */
         write(fd, input.c_str(), sizeof(input));
         
         while(recieve == 0)
@@ -85,7 +96,8 @@ int main(int argc, const char * argv[]) {
         else if(recieve > 128)
             recieve = recieve - 256;
         
-        cout << recieve << endl;
+        check = check - recieve;
+        cout << "Goal Position = " << input << " Actual position = " << check << endl;
         recieve = 0;
         
     }

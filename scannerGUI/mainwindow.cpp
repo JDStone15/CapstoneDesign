@@ -8,9 +8,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // iMac image location
-    QPixmap logo(LOGO_IMAGE_IMAC);
+    //QPixmap logo(LOGO_IMAGE_IMAC);
     // Macbook image location
-    //QPixMap logo(LOGO_IMAGE_MACBOOK);
+    QPixmap logo(LOGO_IMAGE_MACBOOK);
 
     ui->label_logo->setPixmap(logo);
 }

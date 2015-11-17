@@ -12,11 +12,12 @@
 #include "common.h"
 
 
-// This is temporary until given correct alpha
-const float alpha = 30;
+// Measured angle between cam and laser at motor
+const float alpha = 31.788;
 
-const float imageHeight = 700;
-const float camOpticalAxel = 350;
+const float imageHeight = 720;
+// 1280/2
+const float camOpticalAxel = 640;
 
 // Amout of millimeters in a pixel
 // According to www.translatorscafe.com

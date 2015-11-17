@@ -9,12 +9,12 @@
 #include "scanner.h"
 
 int H_MIN = 0;
-int S_MIN = 0;
-int V_MIN = 0;
+int S_MIN = 22;
+int V_MIN = 122;
 
-int H_MAX = 256;
-int S_MAX = 256;
-int V_MAX = 256;
+int H_MAX = 255;
+int S_MAX = 255;
+int V_MAX = 255;
 
 int B_MIN = 100;
 int G_MIN = 0;
@@ -90,7 +90,7 @@ int main(int argc, const char * argv[]) {
      waitKey(5000);
      return -1;
      }
-     /*
+     
      createTrackbars();
      while(1){
      inRange(img, Scalar(B_MIN, G_MIN, R_MIN), Scalar(B_MAX, G_MAX, R_MAX), threshold);
@@ -128,7 +128,7 @@ int main(int argc, const char * argv[]) {
     //   capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
     
     //create slider bars for HSV filtering
-    createTrackbars();
+    //createTrackbars();
     
     while(1){
         capture.read(cameraFeed);

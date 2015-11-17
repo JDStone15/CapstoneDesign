@@ -6,7 +6,7 @@
 
 
 #define LOGO_IMAGE_IMAC "/Users/jacobstone/Documents/Github/CapstoneDesign/scannerGUI/logo.gif"
-#define LOGO_IMAGE_MACBOOK "/Users/jacobstone/Documents/Github/CapstoneDesign/scannerGUI/logo.gif"
+#define LOGO_IMAGE_MACBOOK "/Users/jacobstone/Documents/CapstoneDesign/scannerGUI/logo.gif"
 
 using namespace std;
 using namespace cv;
