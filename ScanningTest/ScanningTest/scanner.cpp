@@ -14,51 +14,62 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img){
     Mat nonZeroCoordinates;
     img.copyTo(temp);
     bool checkForPoint = false;
+    
     float a, x, y, z;
-    //    float xavg = 0;
     float aAvg = 0;
     int tempY = 0;
     int tempZ = 0;
+    
     // src1 used only for debugging purposes!
     // src1 will display midpoint line to make sure it is accurate
     IplImage* src1 = cvLoadImage(binaryImage.c_str());
     
     vector<Point3f> tempmidPoints;
-    
-    
     vector<vector<Point3f> > allPoints(780);
     
     findNonZero(img, nonZeroCoordinates);
+    
     for (int i = 0; i < nonZeroCoordinates.total(); i++ ) {
-        //cout << "Zero#" << i << ": " << nonZeroCoordinates.at<Point>(i).x << ", " << nonZeroCoordinates.at<Point>(i).y << endl;
+        
+        // Store every non zero pixel into an vector of vectors
         a = nonZeroCoordinates.at<Point>(i).x;
-        //       x =
         y = nonZeroCoordinates.at<Point>(i).y;
-        z = i;
+        z = i;                                  // Assigning z a random value (will be calculated later)
+        
+        // Create a temporary point and store into allPoints
         Point3f now = Point3f(a, y, z);
         allPoints[y].push_back(now);
+        
     }
     
+    // for all vectors contained in allPoints
     for(int i = 0; i < allPoints.size(); i++){
+        
+        // For all pixels with the same y value
+        // we want to create a single averaged pixel
         for(int j = 0; j < allPoints[i].size(); j++){
-            //  cout << allPoints[i][j].x << "  " << allPoints[i][j].y << endl;
+            
             aAvg += (float)allPoints[i][j].x;
             checkForPoint = true;
+            
             // We must flip the image otherwise it will be upside down
             tempY = imageHeight - allPoints[i][j].y;
             tempZ = allPoints[i][j].z;
             
         }
         if(checkForPoint == true){
+            
             aAvg = aAvg / (float)allPoints[i].size();
             calculateCoordinates(aAvg, x, z);
+            
             Point3f tempPoint(x, tempY, z);
-            //            Point3f tempPoint(aAvg, tempY, tempZ);
             midPoints.push_back(tempPoint);
             
             // CvPoint is used only for drawing onto image on screen
+            // FOR TESTING!!!
             CvPoint drawing = cvPoint(aAvg, tempY);
             cvLine(src1, drawing, drawing, red);
+            
             checkForPoint = false;
         }
         aAvg = 0;

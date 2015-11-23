@@ -50,11 +50,11 @@ void loop() {
     delay(100);
     
     // Try to reach the desired servo motor position
-    for(int i = 0; i < 5; ++i){
+    for(int i = 0; i < 2; ++i){
       currPosition = GetPosition(1);
       delay(100);
       if(currPosition == pos)
-        i = 5;
+        i = 2;
       //delay(100);
     }
     

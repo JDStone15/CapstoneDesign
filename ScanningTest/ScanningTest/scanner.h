@@ -47,6 +47,9 @@ public:
     void calculateCoordinates(float a, float &x, float &z);
     void writeToTxtFile(vector<Point3f> outputPoints);
     vector<Point3f> getmidPoints(){return midPoints; }
+    void incrmentfi(float incr){
+        fi += incr;
+    }
 };
 
 #endif

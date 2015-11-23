@@ -72,32 +72,35 @@ int main(int argc, const char * argv[]) {
     handshake(fd, 0);
     
     // just for testing purposes
-    for(int i = 0; i < 10; ++i){
-        cout << "Enter number between 0 and 4095 to move servo: ";
-        cin >> input;
-        int check = atoi(input.c_str());
-  /*      if(check < 0 || check > 4095){
-            cout << "error in input" << endl;
-            input = "-1";
-            write(fd, input.c_str(), sizeof(input));
-            sleep(1);
-            close(fd);
-            sleep(1);
-            return 0;
-        }
-        */
-        write(fd, input.c_str(), sizeof(input));
+    for(int i = 0; i < 1365; ++i){
+        //cout << "Enter number between 0 and 4095 to move servo: ";
+        //cin >> input;
+        //int check = atoi(input.c_str());
+        int check = i*3;
+        //input = to_string(i);
+        cout << "before write ";
+        write(fd, to_string(check).c_str(), sizeof(to_string(check).c_str()));
         
-        while(recieve == 0)
+        usleep(100);
+       cout << "write" << endl;
+        // write(fd, input.c_str(), sizeof(input));
+        cout << "before receve ";
+        while(recieve == 0){
             read(fd, &recieve, sizeof(recieve));
-        
+            usleep(100);
+        }
+        cout << "read" << endl;
         if(recieve == 255)
             recieve = 0;
         else if(recieve > 128)
             recieve = recieve - 256;
         
-        check = check - recieve;
-        cout << "Goal Position = " << input << " Actual position = " << check << endl;
+       // check += recieve;
+        cout << "Goal Position = " << check;
+        check += recieve;
+        cout << " Actual position = " << check << endl;
+        if(check > i)
+            i = check / 3;
         recieve = 0;
         
     }

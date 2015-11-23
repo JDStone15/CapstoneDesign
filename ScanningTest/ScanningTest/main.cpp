@@ -110,9 +110,7 @@ int main(int argc, const char * argv[]) {
     
     
     //    bool findEdges = true;
-    
-    int x = 0;
-    int y = 0;
+
     
     // Video Capture object to acquire webcam feed
     VideoCapture capture;
