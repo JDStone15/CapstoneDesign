@@ -11,6 +11,7 @@ String readstring;
 
 void setup(){
     Serial.begin(9600);
+    delay(100);
     pinMode(led,OUTPUT);
     delay(10);
     
@@ -18,7 +19,8 @@ void setup(){
     
     // Write to USB port to let computer know serial communication established
     Serial.write(sendByte);
-    delay(10);
+    Serial.flush();        // wait for write to finish
+    //delay(10);
         // Set the position of servoID to 0
     SetPosition(1, 0); 
     delay(500);                //wait for servo to move
@@ -28,7 +30,7 @@ void loop() {
     
   // While there is data available in the USB port
   while (Serial.available()) {
-    delay(10);  
+    //delay(10);  
     if (Serial.available() > 0) {
       char c = Serial.read();      // gets one byte from serial buffer
       readstring += c;             // truncates to readstring
@@ -50,11 +52,11 @@ void loop() {
     delay(100);
     
     // Try to reach the desired servo motor position
-    for(int i = 0; i < 2; ++i){
+    for(int i = 0; i < 5; ++i){
       currPosition = GetPosition(1);
-      delay(100);
+      delay(10);
       if(currPosition == pos)
-        i = 2;
+        i = 5;
       //delay(100);
     }
     
@@ -65,6 +67,7 @@ void loop() {
       
     // Write the position error to the USB  
     Serial.write(positionError);
+    Serial.flush();              // wait for write to finish
     
     // Delete readstring data
     readstring="";

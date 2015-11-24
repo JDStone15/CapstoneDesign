@@ -98,8 +98,8 @@ int main(int argc, const char * argv[]) {
        // check += recieve;
         cout << "Goal Position = " << check;
         check += recieve;
-        cout << " Actual position = " << check << endl;
-        if(check > i)
+        cout << "position error = " << recieve << endl;
+        if(check > (i*3))
             i = check / 3;
         recieve = 0;
         

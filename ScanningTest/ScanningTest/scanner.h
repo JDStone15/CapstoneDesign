@@ -13,7 +13,8 @@
 
 
 // Measured angle between cam and laser at motor
-const float alpha = 31.788;
+//const float alpha = 31.788;
+const float alpha = 65;
 
 const float imageHeight = 720;
 // 1280/2
@@ -22,8 +23,8 @@ const float camOpticalAxel = 640;
 // Amout of millimeters in a pixel
 // According to www.translatorscafe.com
 // Probably different at longer distances
-// const float mmPerPixel = 3.779528;
-const float mmPerPixel = 1;         // just temp
+// const float mmPerPixel = .264583;
+ const float mmPerPixel = 1;         // just temp
 
 class Scanner{
 private:
@@ -42,7 +43,7 @@ public:
     Scanner(): fi(0) {};
     //    ~Scanner(void);
     
-    void drawMidpoint(Mat threshold, Mat &img);
+    void drawMidpoint(Mat threshold, Mat &img, int i);
     string getbinaryImage(){ return binaryImage; }
     void calculateCoordinates(float a, float &x, float &z);
     void writeToTxtFile(vector<Point3f> outputPoints);
@@ -50,6 +51,7 @@ public:
     void incrmentfi(float incr){
         fi += incr;
     }
+    
 };
 
 #endif

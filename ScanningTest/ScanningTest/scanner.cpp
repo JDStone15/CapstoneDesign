@@ -8,7 +8,12 @@
 
 #include "scanner.h"
 
-void Scanner::drawMidpoint(Mat threshold, Mat &img){
+bool myfunc(const Point3f & a,const Point3f & b ){
+    return a.x > b.x;
+}
+
+
+void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
     
     Mat temp;
     Mat nonZeroCoordinates;
@@ -20,12 +25,10 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img){
     int tempY = 0;
     int tempZ = 0;
     
-    // src1 used only for debugging purposes!
-    // src1 will display midpoint line to make sure it is accurate
-    IplImage* src1 = cvLoadImage(binaryImage.c_str());
+    fi = float(i) *.088 * 3;
     
     vector<Point3f> tempmidPoints;
-    vector<vector<Point3f> > allPoints(780);
+    vector<vector<Point3f> > allPoints(1280);
     
     findNonZero(img, nonZeroCoordinates);
     
@@ -36,9 +39,13 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img){
         y = nonZeroCoordinates.at<Point>(i).y;
         z = i;                                  // Assigning z a random value (will be calculated later)
         
-        // Create a temporary point and store into allPoints
-        Point3f now = Point3f(a, y, z);
-        allPoints[y].push_back(now);
+        // Ignore all points that are not on the right side of
+        // of the camera's optical axel
+        if(a > camOpticalAxel){
+            // Create a temporary point and store into allPoints
+            Point3f now = Point3f(a, y, z);
+            allPoints[y].push_back(now);
+        }
         
     }
     
@@ -46,40 +53,46 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img){
     for(int i = 0; i < allPoints.size(); i++){
         
         // For all pixels with the same y value
+        // we want to take the median x value
+        // which will eliminate random outliers
+        size_t size = allPoints[i].size();
+        
+        if(size > 0){
+            checkForPoint = true;
+            sort(allPoints[i].begin(), allPoints[i].end(), myfunc);
+            if (size  % 2 == 0)
+                aAvg = (float)((allPoints[i][size / 2 - 1].x + allPoints[i][size / 2].x) / 2);
+        
+            else
+                aAvg = (float)allPoints[i][size / 2].x;
+        }
+        
+        // For all pixels with the same y value
         // we want to create a single averaged pixel
         for(int j = 0; j < allPoints[i].size(); j++){
             
-            aAvg += (float)allPoints[i][j].x;
-            checkForPoint = true;
+            //aAvg += (float)allPoints[i][j].x;
+            //checkForPoint = true;
             
             // We must flip the image otherwise it will be upside down
             tempY = imageHeight - allPoints[i][j].y;
             tempZ = allPoints[i][j].z;
             
         }
+        
         if(checkForPoint == true){
             
-            aAvg = aAvg / (float)allPoints[i].size();
+            //aAvg = aAvg / (float)allPoints[i].size();
             calculateCoordinates(aAvg, x, z);
             
             Point3f tempPoint(x, tempY, z);
             midPoints.push_back(tempPoint);
             
-            // CvPoint is used only for drawing onto image on screen
-            // FOR TESTING!!!
-            CvPoint drawing = cvPoint(aAvg, tempY);
-            cvLine(src1, drawing, drawing, red);
-            
             checkForPoint = false;
         }
         aAvg = 0;
     }
-    
-    //   writeToTxtFile(midPoints);
-    
-    cvShowImage("Midpoint line", src1);
-    fi += 3;
-    //   getchar();
+
 }
 
 void Scanner::calculateCoordinates(float a, float &x, float &z){
@@ -89,8 +102,6 @@ void Scanner::calculateCoordinates(float a, float &x, float &z){
     ro = a / sin(alpha);
     x = ro * sin(fi) * mmPerPixel;
     z = ro * cos(fi) * mmPerPixel;
-    //   fi += 1.0;
-    
     
 }
 

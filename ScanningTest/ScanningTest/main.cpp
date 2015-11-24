@@ -8,6 +8,7 @@
 
 #include "scanner.h"
 
+
 int H_MIN = 0;
 int S_MIN = 22;
 int V_MIN = 122;
@@ -16,18 +17,7 @@ int H_MAX = 255;
 int S_MAX = 255;
 int V_MAX = 255;
 
-int B_MIN = 100;
-int G_MIN = 0;
-int R_MIN = 0;
 
-int B_MAX = 256;
-int G_MAX = 256;
-int R_MAX = 256;
-
-
-//default capture width and height
-//const int FRAME_WIDTH = 640;
-//const int FRAME_HEIGHT = 480;
 
 //names that will appear at the top of each window
 const string windowName = "Original Image";
@@ -37,38 +27,44 @@ const string windowName3 = "After Morphological Operations";
 const string trackbarWindowName = "Trackbars";
 
 
-
-void on_trackbar( int, void* ){
-    //This function gets called whenever a
-    // trackbar position is changed
+// Found online
+void init_port(int *fd){
+    struct termios options;
+    tcgetattr(*fd,&options);
+    
+    cfsetispeed(&options,B9600);    // set input baud rate
+    cfsetospeed(&options,B9600);    // set output baud rate
+    
+    options.c_cflag |= (CLOCAL | CREAD);
+    options.c_cflag &= ~PARENB;
+    options.c_cflag &= ~CSTOPB;
+    options.c_cflag &= ~CSIZE;
+    options.c_cflag |= CS8;
+    tcsetattr(*fd,TCSANOW,&options);
 }
 
-void createTrackbars(){
-    //create window for trackbars
+int openFileDescriptor(int &fd){
+    // List usbSerial devices using Terminal ls /dev/tty.*
+    fd = open(USB_SERIAL_PORT, O_RDWR | O_NOCTTY | O_NDELAY);
     
-    String trackbarWindowName = "TRACKBARS";
-    namedWindow(trackbarWindowName,0);
-    //create memory to store trackbar name on window
-    char TrackbarName[50];
-    sprintf( TrackbarName, "B_MIN", B_MIN);
-    sprintf( TrackbarName, "B_MAX", B_MAX);
-    sprintf( TrackbarName, "G_MIN", G_MIN);
-    sprintf( TrackbarName, "G_MAX", G_MAX);
-    sprintf( TrackbarName, "R_MIN", R_MIN);
-    sprintf( TrackbarName, "R_MAX", R_MAX);
-    
-    //create trackbars
-    createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
-    createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
-    createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
-    createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
-    createTrackbar( "I_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
-    createTrackbar( "I_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
-    
+    // Check for port errors
+    if(fd == -1) {
+        perror("Unable to open serial port\n");
+        return -1;
+    }
+    cout << "Serial port successfully opened\n";
+    cout << "Initializing usb port...\n";
+    return 0;
     
 }
 
-
+void handshake(int &fd, int initialization){
+    // Wait to recieve the initialization from arduino
+    cout << "Waiting for initialization signal from Arduino...\n";
+    while(initialization != 1)
+        read(fd, &initialization, sizeof(initialization));
+    cout << "Initialization signal recieved from Arduino\n";
+}
 
 int main(int argc, const char * argv[]) {
     
@@ -81,36 +77,17 @@ int main(int argc, const char * argv[]) {
     Mat BGRFeed;
     // Matrix for storing the threshold image
     Mat threshold;
-    /*
-     // Used just for testing!!!
-     Mat img = imread(scan.getbinaryImage(), CV_LOAD_IMAGE_GRAYSCALE);
-     if(! img.data )                              // Check for invalid input
-     {
-     cout <<  "Could not open or find the image" << endl ;
-     waitKey(5000);
-     return -1;
-     }
-     
-     createTrackbars();
-     while(1){
-     inRange(img, Scalar(B_MIN, G_MIN, R_MIN), Scalar(B_MAX, G_MAX, R_MAX), threshold);
-     imshow("img", img);
-     imshow("threshold", threshold);
-     waitKey(30);
-     }
-     
-     for(int i = 0; i < 120; i++){
-     inRange(img, Scalar(B_MIN, G_MIN, R_MIN), Scalar(B_MAX, G_MAX, R_MAX), threshold);
-     scan.drawMidpoint(threshold, threshold);
-     }
-     scan.writeToTxtFile(scan.getmidPoints());
-     imshow("Binary", img);
-     getchar();
-     */
     
+    int fd;
+    int recieve = 0;
+    string input;
     
-    //    bool findEdges = true;
-
+    if(openFileDescriptor(fd) == -1)
+        return -1;
+    
+    init_port(&fd);
+    sleep(1);           // give the port time to initialize
+    handshake(fd, 0);
     
     // Video Capture object to acquire webcam feed
     VideoCapture capture;
@@ -121,44 +98,62 @@ int main(int argc, const char * argv[]) {
     // Set height and width of capture frame
     capture.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
     capture.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
-    
-    //   capture.set(CV_CAP_PROP_FRAME_WIDTH, 720);
-    //   capture.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
-    
-    //create slider bars for HSV filtering
-    //createTrackbars();
-    
+
     while(1){
         capture.read(cameraFeed);
         if(!cameraFeed.empty()){
+            for(int i = 0; i < 1365; ++i){
+                
+                int check = i*3;
+
+                write(fd, to_string(check).c_str(), sizeof(to_string(check).c_str()));
+                usleep(100);
+
+                while(recieve == 0){
+                    read(fd, &recieve, sizeof(recieve));
+                    usleep(100);
+                }
+                cout << "read" << endl;
+                if(recieve == 255)
+                    recieve = 0;
+                else if(recieve > 128)
+                    recieve = recieve - 256;
+                
+                //       check += recieve;
+                cout << "Goal Position = " << check;
+                check += recieve;
+                cout << " Actual position = " << check << endl;
+                
+                if(check > (i*3))
+                    i = check / 3;
+                recieve = 0;
+                
+                capture.read(cameraFeed);
+                
+                // Convert the cameraFeed into a HSV colorspace
+                cvtColor(cameraFeed, HSVFeed, COLOR_BGR2HSV);
+                // Filter the HSV image and convert into our threshold cameraFeed
+                inRange(cameraFeed, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+                
+                //imshow("Camera Feed", cameraFeed);
+                imshow("threshold", threshold);
+                
+                waitKey(30);
+                // just for testing purposes
+                scan.drawMidpoint(threshold, threshold, i);
+            }
             
-            // Convert the cameraFeed into a HSV colorspace
-            cvtColor(cameraFeed, HSVFeed, COLOR_BGR2HSV);
-            // Filter the HSV image and convert into our threshold cameraFeed
-            inRange(cameraFeed, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-            
-            
-            //            if(findEdges){
-            //               findEdges(x, y, threshold, cameraFeed);
-            //          }
-            //          trackFilteredObject(x,y,threshold,cameraFeed);
-            //          drawMidpoint(threshold, cameraFeed);
-            imshow("Camera Feed", cameraFeed);
-            imshow("threshold", threshold);
-            //            CannyThreshold(0, threshold, 0);
-            //            printf("B_MIN %d B_MAX %d\n", B_MIN, B_MAX);
-            //            printf("G_MIN %d G_MAX %d\n", G_MIN, G_MAX);
-            //            printf("R_MIN %d R_MAX %d\n", R_MIN, R_MAX);
-            ///            cout << "threshold = \n" << threshold << endl;
+            break;
         }
-        // delay 30 ms so that screen can refresh.
-        //  getchar();
-        waitKey(30);
+        
     }
     
     
-    //    B_MIN 179 B_MAX 256
-    //   G_MIN 150 G_MAX 256
-    //   R_MIN 239 R_MAX 256
+    close(fd);
+    sleep(1);
+    
+    scan.writeToTxtFile(scan.getmidPoints());
+    
     return 0;
 }
+
