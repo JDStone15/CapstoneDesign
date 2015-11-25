@@ -93,15 +93,17 @@ int main(int argc, const char * argv[]) {
     VideoCapture capture;
     
     // Open Webcam (Default location is 0)
-    capture.open(0);
+    capture.open(1);
     
     // Set height and width of capture frame
     capture.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
     capture.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
 
+    
     while(1){
         capture.read(cameraFeed);
         if(!cameraFeed.empty()){
+            // Only performing half of the scan profiles
             for(int i = 0; i < 1365; ++i){
                 
                 int check = i*3;

@@ -81,11 +81,11 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
         }
         
         if(checkForPoint == true){
-            
+            y = tempY;
             //aAvg = aAvg / (float)allPoints[i].size();
-            calculateCoordinates(aAvg, x, z);
+            calculateCoordinates(aAvg, x, y, z);
             
-            Point3f tempPoint(x, tempY, z);
+            Point3f tempPoint(x, y, z);
             midPoints.push_back(tempPoint);
             
             checkForPoint = false;
@@ -95,12 +95,13 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
 
 }
 
-void Scanner::calculateCoordinates(float a, float &x, float &z){
+void Scanner::calculateCoordinates(float a, float &x, float &y, float &z){
     
     float ro;
     a = a - camOpticalAxel;
     ro = a / sin(alpha);
     x = ro * sin(fi) * mmPerPixel;
+    y = y * mmPerPixel;
     z = ro * cos(fi) * mmPerPixel;
     
 }

@@ -21,10 +21,9 @@ const float imageHeight = 720;
 const float camOpticalAxel = 640;
 
 // Amout of millimeters in a pixel
-// According to www.translatorscafe.com
-// Probably different at longer distances
-// const float mmPerPixel = .264583;
- const float mmPerPixel = 1;         // just temp
+// Calculated using matlab
+ const float mmPerPixel = .1582;
+// const float mmPerPixel = 1;         // just temp
 
 class Scanner{
 private:
@@ -45,7 +44,7 @@ public:
     
     void drawMidpoint(Mat threshold, Mat &img, int i);
     string getbinaryImage(){ return binaryImage; }
-    void calculateCoordinates(float a, float &x, float &z);
+    void calculateCoordinates(float a, float &x, float &y, float &z);
     void writeToTxtFile(vector<Point3f> outputPoints);
     vector<Point3f> getmidPoints(){return midPoints; }
     void incrmentfi(float incr){
