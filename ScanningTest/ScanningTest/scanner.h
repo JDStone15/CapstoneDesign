@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Jacob Stone. All rights reserved.
 //
 
+// Webcamera has been permanetely mounted
+
 #ifndef _D_Scanner_scanner_h
 #define _D_Scanner_scanner_h
 
