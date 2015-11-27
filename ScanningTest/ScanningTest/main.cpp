@@ -9,9 +9,9 @@
 #include "scanner.h"
 
 
-int H_MIN = 0;
-int S_MIN = 22;
-int V_MIN = 122;
+int H_MIN = 47;
+int S_MIN = 31;
+int V_MIN = 140;
 
 int H_MAX = 255;
 int S_MAX = 255;
@@ -78,6 +78,8 @@ int main(int argc, const char * argv[]) {
     // Matrix for storing the threshold image
     Mat threshold;
     
+    Mat grey;
+    
     int fd;
     int recieve = 0;
     string input;
@@ -88,12 +90,12 @@ int main(int argc, const char * argv[]) {
     init_port(&fd);
     sleep(1);           // give the port time to initialize
     handshake(fd, 0);
-    
+    //sleep(1);
     // Video Capture object to acquire webcam feed
     VideoCapture capture;
     
     // Open Webcam (Default location is 0)
-    capture.open(1);
+    capture.open(0);
     
     // Set height and width of capture frame
     capture.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
@@ -101,7 +103,7 @@ int main(int argc, const char * argv[]) {
 
     
     while(1){
-        capture.read(cameraFeed);
+       capture.read(cameraFeed);
         if(!cameraFeed.empty()){
             // Only performing half of the scan profiles
             for(int i = 0; i < 1365; ++i){
@@ -109,6 +111,7 @@ int main(int argc, const char * argv[]) {
                 int check = i*3;
 
                 write(fd, to_string(check).c_str(), sizeof(to_string(check).c_str()));
+                tcflush(fd,TCIFLUSH);
                 usleep(100);
 
                 while(recieve == 0){
@@ -126,23 +129,49 @@ int main(int argc, const char * argv[]) {
                 check += recieve;
                 cout << " Actual position = " << check << endl;
                 
-                if(check > (i*3))
-                    i = check / 3;
+                if(check > i*3){
+                    i = check/3;
+                }
                 recieve = 0;
                 
-                capture.read(cameraFeed);
                 
                 // Convert the cameraFeed into a HSV colorspace
-                cvtColor(cameraFeed, HSVFeed, COLOR_BGR2HSV);
+                //cvtColor(cameraFeed, HSVFeed, COLOR_BGR2HSV);
                 // Filter the HSV image and convert into our threshold cameraFeed
-                inRange(cameraFeed, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+                //inRange(cameraFeed, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+                
+                
+                cvtColor(cameraFeed, grey, CV_BGR2GRAY);
+                uchar maxIntensity = 0;
+                int x = 0;
+                int y = 0;
+                bool found = false;
+                
+                //img = imread(scan.getunfilteredImage(), CV_LOAD_IMAGE_GRAYSCALE);
+                for(int j = 0; j < grey.rows;j++){
+                    for (int i = 0; i < grey.cols; i++){
+                        if(maxIntensity < grey.at<uchar>(j,i)){
+                            maxIntensity = grey.at<uchar>(j,i);
+                            x = i;
+                            y = j;
+                            found = true;
+                        }
+                        grey.at<uchar>(j,i) = 0;
+                    }
+                    if(found == true){
+                        grey.at<uchar>(y,x) = 255;
+                        found = false;
+                    }
+                    maxIntensity = 0;
+                }
+                
                 
                 //imshow("Camera Feed", cameraFeed);
-                imshow("threshold", threshold);
+                //imshow("threshold", threshold);
                 
-                waitKey(30);
+                //waitKey(30);
                 // just for testing purposes
-                scan.drawMidpoint(threshold, threshold, i);
+                scan.drawMidpoint(grey, grey, i*3);
             }
             
             break;

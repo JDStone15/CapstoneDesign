@@ -70,7 +70,7 @@ int main(int argc, const char * argv[]) {
     init_port(&fd);
     sleep(1);           // give the port time to initialize
     handshake(fd, 0);
-    
+    sleep(1);           // give the port time to initialize
     // just for testing purposes
     for(int i = 0; i < 1365; ++i){
         //cout << "Enter number between 0 and 4095 to move servo: ";
@@ -98,12 +98,17 @@ int main(int argc, const char * argv[]) {
        // check += recieve;
         cout << "Goal Position = " << check;
         check += recieve;
-        cout << "position error = " << recieve << endl;
+        cout << "position error = " << check << endl;
         if(check > (i*3))
             i = check / 3;
         recieve = 0;
         
     }
+    int check = -100;
+    
+    write(fd, to_string(check).c_str(), sizeof(to_string(check).c_str()));
+    usleep(10000);
+    cout << "returning motor to position 0" << endl;
     
     close(fd);
     sleep(1);

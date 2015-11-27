@@ -25,7 +25,7 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
     int tempY = 0;
     int tempZ = 0;
     
-    fi = float(i) *.088 * 3;
+    fi = float(i) *.088;
     
     vector<Point3f> tempmidPoints;
     vector<vector<Point3f> > allPoints(1280);
@@ -100,8 +100,9 @@ void Scanner::calculateCoordinates(float a, float &x, float &y, float &z){
     float ro;
     a = a - camOpticalAxel;
     ro = a / sin(alpha);
+    
     x = ro * sin(fi) * mmPerPixel;
-    y = y * mmPerPixel;
+    y = y* mmPerPixel;
     z = ro * cos(fi) * mmPerPixel;
     
 }
