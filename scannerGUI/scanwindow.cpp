@@ -7,7 +7,7 @@ ScanWindow::ScanWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    camera.open(1);
+    camera.open(0);
     if(camera.isOpened() == false){
         return;
     }
