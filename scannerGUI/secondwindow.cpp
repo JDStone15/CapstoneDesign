@@ -1,3 +1,4 @@
+
 #include "secondwindow.h"
 #include "ui_secondwindow.h"
 
@@ -19,4 +20,13 @@ void SecondWindow::on_pushButton_clicked()
     ScanWindow scanwindow;
     scanwindow.setModal(true);
     scanwindow.exec();
+}
+
+
+
+void SecondWindow::on_Calibration_button_clicked()
+{
+    CalibrateWindow calibratewindow;
+    calibratewindow.setModal(true);
+    calibratewindow.exec();
 }

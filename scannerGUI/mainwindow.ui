@@ -19,15 +19,27 @@
   <property name="windowTitle">
    <string>3D Scanner</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255)
+</string>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
       <x>505</x>
-      <y>230</y>
+      <y>270</y>
       <width>251</width>
-      <height>121</height>
+      <height>81</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(157, 157, 157)</string>
     </property>
     <property name="text">
      <string>Continue</string>

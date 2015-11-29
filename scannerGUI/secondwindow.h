@@ -3,6 +3,7 @@
 
 #include <QDialog>
 
+#include <calibratewindow.h>
 #include <scanwindow.h>
 
 namespace Ui {
@@ -19,6 +20,10 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+
+
+
+    void on_Calibration_button_clicked();
 
 private:
     Ui::SecondWindow *ui;
