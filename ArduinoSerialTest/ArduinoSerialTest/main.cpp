@@ -60,9 +60,10 @@ void handshake(int &fd, int initialization){
 
 int main(int argc, const char * argv[]) {
     
+    // Declare/initialize variables
     int fd;
     int recieve = 0;
-    string input;
+    int goalPos, actualPos;
     
     if(openFileDescriptor(fd) == -1)
         return -1;
@@ -70,46 +71,44 @@ int main(int argc, const char * argv[]) {
     init_port(&fd);
     sleep(1);           // give the port time to initialize
     handshake(fd, 0);
-    sleep(1);           // give the port time to initialize
-    // just for testing purposes
-    for(int i = 0; i < 1365; ++i){
-        //cout << "Enter number between 0 and 4095 to move servo: ";
-        //cin >> input;
-        //int check = atoi(input.c_str());
-        int check = i*3;
-        //input = to_string(i);
-        cout << "before write ";
-        write(fd, to_string(check).c_str(), sizeof(to_string(check).c_str()));
+    sleep(1);           // give the arduino time to move servo to start position
+
+    // Incrementing the servo 20 steps at a time
+    for(int i = 0; i < 206; ++i){
+
+        goalPos = i*20;
         
+        // We do not want to try to move the servo outside of the range 0-4095
+        if(goalPos > 4095)
+            goalPos = 4095;
+        else if(goalPos < 0)
+            goalPos = 0;
+        
+        write(fd, to_string(goalPos).c_str(), sizeof(to_string(goalPos).c_str()));
         usleep(100);
-       cout << "write" << endl;
-        // write(fd, input.c_str(), sizeof(input));
-        cout << "before receve ";
+        
+        // Wait to recieve data from serial port
         while(recieve == 0){
             read(fd, &recieve, sizeof(recieve));
             usleep(100);
         }
-        cout << "read" << endl;
+        
+        // recieve = 0 while no data available so 255 = 0 from the arduino
+        // also only arduino only sends one byte at a time so
+        // anything greater than 128 is negative
         if(recieve == 255)
             recieve = 0;
         else if(recieve > 128)
             recieve = recieve - 256;
         
-       // check += recieve;
-        cout << "Goal Position = " << check;
-        check += recieve;
-        cout << "position error = " << check << endl;
-        if(check > (i*3))
-            i = check / 3;
+        cout << "Goal Position = " << goalPos;
+        actualPos = goalPos + recieve;   // calulate the actual position
+        cout << "Actual Position = " << actualPos << endl;
+
         recieve = 0;
         
     }
-    int check = -100;
-    
-    write(fd, to_string(check).c_str(), sizeof(to_string(check).c_str()));
-    usleep(10000);
-    cout << "returning motor to position 0" << endl;
-    
+
     close(fd);
     sleep(1);
     return 1;

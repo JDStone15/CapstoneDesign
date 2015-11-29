@@ -8,12 +8,7 @@
 
 #include "scanner.h"
 
-bool myfunc(const Point3f & a,const Point3f & b ){
-    return a.x > b.x;
-}
-
-
-void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
+void Scanner::drawMidpoint(Mat img, int position){
     
     Mat temp;
     Mat nonZeroCoordinates;
@@ -22,10 +17,12 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
     
     float a, x, y, z;
     float aAvg = 0;
-    int tempY = 0;
-    int tempZ = 0;
+    float tempY = 0;
+    float tempZ = 0;
     
-    fi = float(i) *.088;
+    // there are 4095 positions avaialable with servo motor
+    // Also want to convert from degrees to radians
+    fi = (float(position) / 4095) * 2 * PI;
     
     vector<Point3f> tempmidPoints;
     vector<vector<Point3f> > allPoints(1280);
@@ -57,37 +54,27 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
         // which will eliminate random outliers
         size_t size = allPoints[i].size();
         
-        if(size > 0){
+        if(size > 0)
             checkForPoint = true;
-            sort(allPoints[i].begin(), allPoints[i].end(), myfunc);
-            if (size  % 2 == 0)
-                aAvg = (float)((allPoints[i][size / 2 - 1].x + allPoints[i][size / 2].x) / 2);
-        
-            else
-                aAvg = (float)allPoints[i][size / 2].x;
-        }
         
         // For all pixels with the same y value
         // we want to create a single averaged pixel
         for(int j = 0; j < allPoints[i].size(); j++){
             
-            //aAvg += (float)allPoints[i][j].x;
-            //checkForPoint = true;
-            
-            // We must flip the image otherwise it will be upside down
-            tempY = imageHeight - allPoints[i][j].y;
-            tempZ = allPoints[i][j].z;
+            tempY = (float)allPoints[i][j].y;
+            tempZ = (float)allPoints[i][j].z;
+            aAvg =(float)allPoints[i][j].x;
             
         }
         
         if(checkForPoint == true){
             y = tempY;
-            //aAvg = aAvg / (float)allPoints[i].size();
+
             calculateCoordinates(aAvg, x, y, z);
-            
-            Point3f tempPoint(x, y, z);
-            midPoints.push_back(tempPoint);
-            
+            if(y > 0){
+              Point3f tempPoint(x, y, z);
+              midPoints.push_back(tempPoint);
+            }
             checkForPoint = false;
         }
         aAvg = 0;
@@ -97,13 +84,14 @@ void Scanner::drawMidpoint(Mat threshold, Mat &img, int i){
 
 void Scanner::calculateCoordinates(float a, float &x, float &y, float &z){
     
-    float ro;
-    a = a - camOpticalAxel;
-    ro = a / sin(alpha);
+    float ro = (a + 1 - camOpticalAxel) / sin(alphaRadians);
     
-    x = ro * sin(fi) * mmPerPixel;
-    y = y* mmPerPixel;
-    z = ro * cos(fi) * mmPerPixel;
+    x = ro * sin(fi) * mmPerPixelx;
+    z = -1 * ro * cos(fi) * mmPerPixelx;
+
+    // Calculate for the height, need to take into consideration position of laser
+    y = (platformCenterY - y);
+    y = mmPerPixely * (y - ((a - platformCenterX) / (tan(-alphaRadians))));
     
 }
 

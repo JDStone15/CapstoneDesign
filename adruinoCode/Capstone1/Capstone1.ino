@@ -28,13 +28,7 @@ void setup(){
   
   // Set the position of servoID to 0
   SetPosition(1, 0); 
-  delay(500);                //wait for servo to move 
-  
-  
-
-    
-
-  
+  delay(500);                //wait for servo to move  
 
 }
 
