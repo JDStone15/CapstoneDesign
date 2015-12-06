@@ -26,13 +26,12 @@ const float mmPerPixely = .236686;
 class Scanner{
 private:
 
-    string txtFile = "Output.txt";
     float fi;
+    string txtFile;
     vector<Point3f> midPoints;
 
-
 public:
-    Scanner(): fi(0) {}
+    Scanner(): fi(0), txtFile("Output.txt") {}
     //    ~Scanner(void);
 
     void drawMidpoint(Mat img, int i);

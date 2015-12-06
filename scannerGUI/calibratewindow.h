@@ -16,8 +16,6 @@ public:
     explicit CalibrateWindow(QWidget *parent = 0);
     ~CalibrateWindow();
 
-    void drawLine(Mat img, Point start, Point end);
-
 private:
     Ui::CalibrateWindow *ui;
 

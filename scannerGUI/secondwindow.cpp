@@ -30,3 +30,8 @@ void SecondWindow::on_Calibration_button_clicked()
     calibratewindow.setModal(true);
     calibratewindow.exec();
 }
+
+void SecondWindow::on_cameraSelectButton_clicked()
+{
+    ui->textBrowser->append("not implemented");
+}

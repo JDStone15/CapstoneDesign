@@ -25,6 +25,8 @@ private slots:
 
     void on_Calibration_button_clicked();
 
+    void on_cameraSelectButton_clicked();
+
 private:
     Ui::SecondWindow *ui;
 };

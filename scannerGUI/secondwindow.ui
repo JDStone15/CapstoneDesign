@@ -67,7 +67,7 @@
     <string>Camera Selection</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>750</x>
@@ -126,6 +126,16 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QTextBrowser" name="textBrowser">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>290</y>
+     <width>256</width>
+     <height>301</height>
+    </rect>
+   </property>
   </widget>
  </widget>
  <resources/>

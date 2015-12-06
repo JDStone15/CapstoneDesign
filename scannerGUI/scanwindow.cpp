@@ -9,14 +9,7 @@ ScanWindow::ScanWindow(QWidget *parent) :
     ui(new Ui::ScanWindow)
 {
     ui->setupUi(this);
-/*
-    camera.open(0);
-    if(camera.isOpened() == false){
-        return;
-    }
-    camera.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
-    camera.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
-*/
+
 //    tmrTimer = new QTimer(this);
 //    connect(tmrTimer, SIGNAL(timeout()), this, SLOT(processFrameAndUpdateGui()));
 //    tmrTimer->start(20);    // start timer, every 20 milliseconds
@@ -26,8 +19,8 @@ ScanWindow::~ScanWindow()
 {
     delete ui;
 }
-/*
 
+/*
 void ScanWindow::processFrameAndUpdateGui(){
 
     camera.read(cameraFeed);
@@ -43,23 +36,7 @@ void ScanWindow::processFrameAndUpdateGui(){
     QImage small = qimgCameraFeed.scaled(640, 360, Qt::KeepAspectRatio);
     ui->lblcamera->setPixmap(QPixmap::fromImage(small));
 }
-
-
-void ScanWindow::on_on_btnPauseOrResume_clicked(){
-
-    if(tmrTimer->isActive() == true){
-        tmrTimer->stop();
-        ui->on_btnPauseOrResume->setText("resume");
-    }
-    else{
-        tmrTimer->start(20);    // restart timer
-        ui->on_btnPauseOrResume->setText("pause");
-    }
-}
-
 */
-
-
 
 // Found online
 void init_port(int *fd){
@@ -86,21 +63,18 @@ int openFileDescriptor(int &fd){
         perror("Unable to open serial port\n");
         return -1;
     }
-    qDebug() << "Serial port successfully opened\n";
-    qDebug() << "Initializing usb port...\n";
     return 0;
 
 }
 
 void handshake(int &fd, int initialization){
     // Wait to recieve the initialization from arduino
-    qDebug() << "Waiting for initialization signal from Arduino...";
     while(initialization != 1)
         read(fd, &initialization, sizeof(initialization));
-    qDebug() << "Initialization signal recieved from Arduino";
+
 }
 
-void performScan(){
+void ScanWindow::performScan(){
 
     Scanner scan;
 
@@ -114,24 +88,29 @@ void performScan(){
     int goalPos, actualPos;
 
     if(openFileDescriptor(fd) == -1)
-        //return -1;
         exit(1);
+    ui->textBrowser->append("Serial port successfully opened");
+
+    ui->textBrowser->append("Initializing usb port...");
     init_port(&fd);
     sleep(1);           // give the port time to initialize
+    
+    ui->textBrowser->append("Waiting for initialization signal from Arduino...");
     handshake(fd, 0);
     sleep(1);
+    ui->textBrowser->append("Initialization signal recieved from Arduino");
+
     // Video Capture object to acquire webcam feed
     VideoCapture capture;
 
     // Open Webcam (Default location is 0)
-    capture.open(0);
+    capture.open(1);
 
     // Set height and width of capture frame
     capture.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
     capture.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
 
-    qDebug() << "Please place item on platform and enter any character to begin your scan";
-    //getchar();
+    ui->textBrowser->append("Beginning scan, Please do not move scanning environment");
 
     while(1){
        capture.read(cameraFeed);
@@ -147,8 +126,7 @@ void performScan(){
                 else if(goalPos < 0)
                     goalPos = 0;
 
-                //write(fd, to_string(goalPos).c_str(), sizeof(to_string(goalPos).c_str()));
-                //write(fd, QString::number(goalPos).toStdString().c_str(), sizeof(QString::number(goalPos).toStdString().c_str()));
+                write(fd, QString::number(goalPos).toStdString().c_str(), sizeof(QString::number(goalPos).toStdString().c_str()));
                 usleep(100);
 
                 while(recieve == 0){
@@ -165,7 +143,9 @@ void performScan(){
                     recieve = recieve - 256;
 
                 actualPos = goalPos + recieve;
-                qDebug() << "Goal Position = " << goalPos << " Actual position = " << actualPos;
+                QString out = "Goal Position = " + QString::number(goalPos);
+                out += " Actual Position = " + QString::number(actualPos);
+                ui->textBrowser->append(out);
 
                 recieve = 0;
 
@@ -195,7 +175,7 @@ void performScan(){
                         grey.at<uchar>(y,x) = 255;
                         found = false;
                     }
-                    maxIntensity = 0;
+                    maxIntensity = 75;
                 }
 
                 // Function used to calculate coordinates for line laser
@@ -212,14 +192,14 @@ void performScan(){
         }
 
     }
+    ui->textBrowser->append("Scan complete");
 
-
-    close(fd);
+    ::close(fd);
     sleep(1);
-
+    ui->textBrowser->append("Point cloud wrote to: ");
     scan.writeToTxtFile(scan.getmidPoints());
-
-    //return 0;
+    QString out = QDir::currentPath() + "/Output.txt";
+    ui->textBrowser->append(out);
 }
 
 void ScanWindow::on_on_btnPauseOrResume_clicked(){

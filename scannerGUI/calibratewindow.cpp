@@ -7,7 +7,7 @@ CalibrateWindow::CalibrateWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    camera.open(0);
+    camera.open(1);
     if(camera.isOpened() == false){
         return;
     }
@@ -25,25 +25,26 @@ CalibrateWindow::~CalibrateWindow()
     delete ui;
 }
 
-void CalibrateWindow::drawLine(Mat img, Point start, Point end){
-    int thickness = 3;
-    int lineType = 8;
-    line(img, start, end, Scalar(255, 0, 0), thickness, lineType);
-}
-
-
 void CalibrateWindow::processFrameAndUpdateGui(){
 
     camera.read(cameraFeed);
     if(cameraFeed.empty() == true)
         return;
 
-
     // QT works better in RGB not BGR
     cvtColor(cameraFeed, cameraFeed, CV_BGR2RGB);
 
-    drawLine(cameraFeed, Point(640, 0), Point(640, 720));
-    drawLine(cameraFeed, Point(0, 592), Point(1280, 592));
+    // Drawing red lines used to algin camera
+    for(int i = 0; i < cameraFeed.rows; i++){
+        cameraFeed.at<Vec3b>(i, 640)[0] = 255;
+        cameraFeed.at<Vec3b>(i, 640)[1] = 0;
+        cameraFeed.at<Vec3b>(i, 640)[2] = 0;
+    }
+    for(int i = 0; i < cameraFeed.cols; i++){
+        cameraFeed.at<Vec3b>(592, i)[0] = 255;
+        cameraFeed.at<Vec3b>(592, i)[1] = 0;
+        cameraFeed.at<Vec3b>(592, i)[2] = 0;
+    }
 
     QImage qimgCameraFeed((uchar*)cameraFeed.data, cameraFeed.cols, cameraFeed.rows, cameraFeed.step, QImage::Format_RGB888);
 
